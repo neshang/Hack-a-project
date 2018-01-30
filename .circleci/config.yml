@@ -12,6 +12,6 @@ jobs:
           name: Print the Current Time
           command: date
       - run:
-          name: Fail
-          command: fail 
+          name: Pass
+          command: true 
 
