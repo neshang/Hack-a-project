@@ -1,23 +1,20 @@
---- 
-jobs: 
-  build: 
-    docker: 
-      - 
-        image: "buildpack-deps:trusty"
-    steps: 
-      - checkout
-      - 
-        run: "echo Build worked"
-  test: 
-    docker: ~
-    steps: 
-      - checkout
-      - 
-        run: "echo Tests pass"
 version: 2
-workflows: 
-  build_and_test: 
-    jobs: 
+jobs:
+  build:
+    docker:
+      - image: "buildpack-deps:trusty"
+    steps:
+      - checkout
+      - run: "echo Build worked"
+  test:
+    docker:
+      - image: "buildpack-deps:trusty"
+    steps:
+      - checkout
+      - run: "echo Build worked"
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
       - build
       - test
-  version: 2
