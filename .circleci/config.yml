@@ -2,16 +2,19 @@ version: 2
 jobs:
   build:
     docker:
-      - image: debian:stretch
+      - image: "buildpack-deps:trusty"
     steps:
       - checkout
-      - run:
-          name: Greeting
-          command: echo Hello, world.
-      - run:
-          name: Print the Current Time
-          command: date
-      - run:
-          name: Pass
-          command: true 
-
+      - run: "echo Build worked"
+  test:
+    docker:
+      - image: "buildpack-deps:trusty"
+    steps:
+      - checkout
+      - run: "echo Build worked"
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test
