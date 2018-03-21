@@ -6,9 +6,22 @@
     <title>Hack-a-project</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="static/speechRecognition.js"></script>
+    <style>
+        input[type=text] {
+          width: 50%;
+          padding: 100px 100px;
+          margin: 8px 0;
+          box-sizing: border-box;
+        }
+    </style>
 </head>
-<body>
 
+<body>
+    <h1>You can start speaking. </h1>
+    <form>
+      <!-- <label for="fname">First Name</label> -->
+      <input align="left|top" type="text" id="fname" name="fname">
+    </form>
     <button id="count">Count</button>
     <button id="show">Show</button>
     <div id="result"></div>
