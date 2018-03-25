@@ -45,19 +45,39 @@ dicTextarea.on('input', function() {
   noteContent = $(this).val();
 })
 
+let wfIterator = word_freq.keys()
+function cb() {
+  const n = wfIterator.next()
+  if (n.done) {
+    wfIterator = word_freq.keys()
+    return
+  }
+
+  appendResult (word_freq.get(n.value), n.value, cb)
+}
+
 $('#finish-record-btn').on('click', function(e) {
   recognition.stop();
   document.getElementById('analysis-result').innerHTML = ""
-  word_freq.forEach(appendResult);
+
+  const initial = wfIterator.next()
+  appendResult(word_freq.get(initial.value), initial.value, cb)
 
   console.log("Finish record button is pressed...");
 })
 
-function appendResult(value, key, map) {
+function appendResult(value, key, callback) {
   document.getElementById('analysis-result').innerHTML += `<span class="word"> ${key}</span>`
-  document.getElementById('analysis-result').innerHTML += `<span class="frequency"> ${value}</span>`
-  document.getElementById('analysis-result').innerHTML += `<br>`
-  
+  document.getElementById('analysis-result').innerHTML += `<span class="frequency"> ${value}</span><br>`
+
+  /* Request synonyms from Words API */
+  $.getJSON( `https://api.datamuse.com/words?rel_syn=${key}`, function( data ) {
+    for (let word of data) {
+      document.getElementById('analysis-result').innerHTML += `${word.word}<br>`
+    }
+
+    callback()
+  })  
 }
 
 recognition.onresult = function(event) {
