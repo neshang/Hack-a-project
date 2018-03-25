@@ -26,17 +26,35 @@
       #main > h1 {
         padding: 70px 50px 40px 90px;
       }
-      #main > div > textarea {
+      #main textarea {
         -webkit-border-radius: 5px;
         -moz-border-radius: 5px;
         border-radius: 5px;
         border:1px solid #719ECE;
         box-shadow: 0 0 10px #719ECE;
-        width:40%;
+        width:100%;
+        height:250px;
+      }
+
+      #main > #analysis-result {
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        border:1px solid #719ECE;
+        box-shadow: 0 0 10px #719ECE;
+        width:60%;
         height:250px;
       }
       #main > div {
         margin:0px 20px 20px 90px;
+      }
+
+      span.word {
+        font-weight: bolder;
+
+      }
+      span.frequence {
+        font-weight: bold;
       }
     </style>
 
@@ -132,11 +150,19 @@
         <button id="pause-record-btn" type="button" class="btn btn-info">Pause</button>
         <button id="finish-record-btn" type="button" class="btn btn-info">Finish Recording</button>
       </div>
+      
       <div class="container-fluid">
-        <textarea id="dic-textarea" placeholder="Create a new note using voice recognition."></textarea>
-
+        <div class="row">
+            <div class="col-lg-6">
+              <textarea id="dic-textarea" placeholder="Create a new note using voice recognition."></textarea>
+            </div>
+            <div class="col-lg-6">
+              <div id="analysis-result">
+                Output something after recording.
+              </div>
+            </div>
+        </div>
       </div>
-
      </section>
 
     <!-- Footer -->
