@@ -20,25 +20,25 @@ const untracked_words = new Set(["the","be","to","of","and","a","in","that","hav
                                 "any","these","give","day","most","us", "it's","I'll", "off", "I'm"])
 
 /* A map keeps track of word and frequency */
-var word_freq = new Map()
+let word_freq = new Map()
 
 /* Buttons and input */
 $('#start-record-btn').on('click', function(e) {
   /* Clean up the textareas */
   dicTextarea.val("")
   document.getElementById('analysis-result').innerHTML = ""
-  work_freq = new Map()
+  word_freq.clear()
 
   if (noteContent.length) {
     noteContent += ' ';
   }
   recognition.start();
-  console.log("Recognition start...");
+  // console.log("Recognition start...");
 });
 
 $('#pause-record-btn').on('click', function(e) {
   recognition.stop();
-  console.log("Recognition stop...");  
+  // console.log("Recognition stop...");  
 });
 
 dicTextarea.on('input', function() {
@@ -48,7 +48,7 @@ dicTextarea.on('input', function() {
 /* Call back function */
 let wfIterator = word_freq.keys()
 function cb() {
-  console.log("call back is called")
+  // console.log("call back is called")
   const n = wfIterator.next()
   if (n.done) {
     wfIterator = word_freq.keys()
@@ -63,23 +63,24 @@ $('#finish-record-btn').on('click', function(e) {
   document.getElementById('analysis-result').innerHTML = ""
 
   /* sort the word_freq list */
-  let word_freq_list_sorted = sort_map(word_freq)
-  console.log(word_freq_list_sorted)
+  let word_freq_sorted = sort_map(word_freq)
+  // console.log(word_freq_sorted)
 
   const initial = wfIterator.next()
-  appendResult(word_freq.get(initial.value), initial.value, cb)
+  appendResult(word_freq_sorted.get(initial.value), initial.value, cb)
 
-  console.log("Finish record button is pressed...")
+  // console.log("Finish record button is pressed...")
 })
 
 /* Sorting the map using frequency */
 function sort_map(ini_map) {
   let a = []
+  
   for(var x of ini_map) 
     a.push(x)
 
   a.sort(function(x, y) {
-    return x[1] - y[1]
+    return y[1] - x[1]
   })
   
   return new Map(a)
@@ -149,7 +150,7 @@ function analysisSentence(string) {
         var freq = word_freq.get(words[i])
         freq++
         word_freq.set(words[i], freq)
-        console.log(`The word is ${words[i]} and the requency is ${freq}`)
+        // console.log(`The word is ${words[i]} and the requency is ${freq}`)
       } else {
         word_freq.set(words[i], 1)
       }
