@@ -16,7 +16,7 @@ const untracked_words = new Set(["the","be","to","of","and","a","in","that","hav
                                 "about","who","get","which","go","me","when","make","can","like","time","no","just",
                                 "him","know","take","people","into","year","your","good","some","could","them","see",
                                 "other","than","then","now","look","only","come","its","over","think","also","back",
-                                "after","use","two","how","our","work","first","well","way","even","new","want","because",
+                                "after","use","two","how","our","work","first","way","even","is",
                                 "any","these","give","day","most","us", "it's","I'll", "off", "I'm"])
 
 /* A map keeps track of word and frequency */
@@ -45,6 +45,7 @@ dicTextarea.on('input', function() {
   noteContent = $(this).val();
 })
 
+/* Call back function */
 let wfIterator = word_freq.keys()
 function cb() {
   console.log("call back is called")
@@ -61,28 +62,29 @@ $('#finish-record-btn').on('click', function(e) {
   recognition.stop();
   document.getElementById('analysis-result').innerHTML = ""
 
+  /* sort the word_freq list */
+  let word_freq_list_sorted = sort_map(word_freq)
+  console.log(word_freq_list_sorted)
+
   const initial = wfIterator.next()
   appendResult(word_freq.get(initial.value), initial.value, cb)
 
-  console.log("Finish record button is pressed...");
+  console.log("Finish record button is pressed...")
 })
 
-/*
-    <div class="card-header" id="headingOne">
-      <h5 class="mb-0">
-        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Collapsible Group Item #1
-        </button>
-      </h5>
-    </div>
+/* Sorting the map using frequency */
+function sort_map(ini_map) {
+  let a = []
+  for(var x of ini_map) 
+    a.push(x)
 
-    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-      <div class="card-body">
-        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-      </div>
-    </div>
-  </div>
-*/
+  a.sort(function(x, y) {
+    return x[1] - y[1]
+  })
+  
+  return new Map(a)
+}
+
 function appendResult(value, key, callback) {
   document.getElementById('analysis-result').innerHTML += 
   `<div class="card">
@@ -101,17 +103,17 @@ function appendResult(value, key, callback) {
       </div>
     </div>
   </div>`
-
+  
   /* Request synonyms from Words API  and append it to the ul */
   $.getJSON( `https://api.datamuse.com/words?rel_syn=${key}`, function( data ) {
-    var ul = document.getElementById(`list-${key}`);
+    var ul = document.getElementById(`list-${key}`)
     let cnt = 0
 
     for (let word of data) {
       cnt++
-      var li = document.createElement("li");
-      li.appendChild(document.createTextNode(word.word));
-      ul.appendChild(li);
+      var li = document.createElement("li")
+      li.appendChild(document.createTextNode(word.word))
+      ul.appendChild(li)
 
       if (cnt == 5) {
         break
@@ -122,7 +124,7 @@ function appendResult(value, key, callback) {
 }
 
 recognition.onresult = function(event) {
-  let final_transcript = '';
+  let final_transcript = ''
 
   for (let i = event.resultIndex; i < event.results.length; ++i) {
     if (event.results[i].isFinal) {
@@ -145,7 +147,9 @@ function analysisSentence(string) {
     if (!untracked_words.has(words[i])) {
       if (word_freq.has(words[i])) {
         var freq = word_freq.get(words[i])
-        word_freq.set(words[i], freq++)
+        freq++
+        word_freq.set(words[i], freq)
+        console.log(`The word is ${words[i]} and the requency is ${freq}`)
       } else {
         word_freq.set(words[i], 1)
       }
