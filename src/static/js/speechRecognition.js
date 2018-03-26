@@ -17,7 +17,7 @@ const untracked_words = new Set(["the","be","to","of","and","a","in","that","hav
                                 "him","know","take","people","into","year","your","good","some","could","them","see",
                                 "other","than","then","now","look","only","come","its","over","think","also","back",
                                 "after","use","two","how","our","work","first","well","way","even","new","want","because",
-                                "any","these","give","day","most","us", "it's","I'll", "off"])
+                                "any","these","give","day","most","us", "it's","I'll", "off", "I'm"])
 
 /* A map keeps track of word and frequency */
 var word_freq = new Map()
@@ -47,6 +47,7 @@ dicTextarea.on('input', function() {
 
 let wfIterator = word_freq.keys()
 function cb() {
+  console.log("call back is called")
   const n = wfIterator.next()
   if (n.done) {
     wfIterator = word_freq.keys()
@@ -66,18 +67,58 @@ $('#finish-record-btn').on('click', function(e) {
   console.log("Finish record button is pressed...");
 })
 
+/*
+    <div class="card-header" id="headingOne">
+      <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Collapsible Group Item #1
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="card-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+*/
 function appendResult(value, key, callback) {
-  document.getElementById('analysis-result').innerHTML += `<span class="word"> ${key}</span>`
-  document.getElementById('analysis-result').innerHTML += `<span class="frequency"> ${value}</span><br>`
+  document.getElementById('analysis-result').innerHTML += 
+  `<div class="card">
+    <div class="card-header" id=${key}>
+      <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${key}" aria-expanded="true" aria-controls="collapse${key}">
+          ${key} with frequency: ${value}
+        </button>
+      </h5>
+    </div>
 
-  /* Request synonyms from Words API */
+    <div id="collapse${key}" class="collapse" aria-labelledby="heading${key}" data-parent="#analysis-result">
+      <div class="card-body">
+        <ul id="list-${key}">
+        </ul>
+      </div>
+    </div>
+  </div>`
+
+  /* Request synonyms from Words API  and append it to the ul */
   $.getJSON( `https://api.datamuse.com/words?rel_syn=${key}`, function( data ) {
-    for (let word of data) {
-      document.getElementById('analysis-result').innerHTML += `${word.word}<br>`
-    }
+    var ul = document.getElementById(`list-${key}`);
+    let cnt = 0
 
+    for (let word of data) {
+      cnt++
+      var li = document.createElement("li");
+      li.appendChild(document.createTextNode(word.word));
+      ul.appendChild(li);
+
+      if (cnt == 5) {
+        break
+      }
+    }
     callback()
-  })  
+  })
 }
 
 recognition.onresult = function(event) {
