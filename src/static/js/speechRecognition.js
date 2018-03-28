@@ -11,13 +11,20 @@ var noteContent = ''
 
 /* Set of words that are not tracked */
 const untracked_words = new Set(["the","be","to","of","and","a","in","that","have","I","it","for","not","on","with",
-                                "he","as","you","do","at","this","but","his","by","from","they","we","say","her","she",
+                                "he","as","you","do","at","this","his","by","from","they","we","say","her","she",
                                 "or","an","will","my","one","all","would","there","their","what","so","up","out","if",
                                 "about","who","get","which","go","me","when","make","can","like","time","no","just",
                                 "him","know","take","people","into","year","your","good","some","could","them","see",
                                 "other","than","then","now","look","only","come","its","over","think","also","back",
-                                "after","use","two","how","our","work","first","way","even","is",
-                                "any","these","give","day","most","us", "it's","I'll", "off", "I'm"])
+                                "after","use","two","how","our","work","first","way","even","is", "shouldn't", "I've", "haven't",
+                                "any","these","give","day","most","us", "it's","I'll", "off", "I'm", "won't", "re", "didn't"])
+
+/* Set of words for transition */
+const ands = new Set(["also", "and", "as well as", "furthermore", "moreover", "along with", "together with"])
+const becauses = new Set(["as a result of", "due to", "because", "for the reason that", "considering", "by cause of","since"])
+const buts = new Set(["but", "however","although", "yet", "though","nevertheless", "on the other"])
+const ors = new Set(["or", "in other words", "as an alternative", "in turn", "as a choice", "as a subsitute"])
+const conjunctions = new Set([...ands, ...becauses, ...buts, ...ors])
 
 /* A map keeps track of word and frequency */
 let word_freq = new Map()
@@ -64,7 +71,7 @@ $('#finish-record-btn').on('click', function(e) {
 
   /* sort the word_freq list */
   let word_freq_sorted = sort_map(word_freq)
-  // console.log(word_freq_sorted)
+  console.log(word_freq_sorted)
 
   const initial = wfIterator.next()
   appendResult(word_freq_sorted.get(initial.value), initial.value, cb)
@@ -76,8 +83,11 @@ $('#finish-record-btn').on('click', function(e) {
 function sort_map(ini_map) {
   let a = []
   
-  for(var x of ini_map) 
-    a.push(x)
+  for(var x of ini_map){
+    if (x[1] > 1) {
+      a.push(x)
+    }
+  }
 
   a.sort(function(x, y) {
     return y[1] - x[1]
@@ -92,7 +102,7 @@ function appendResult(value, key, callback) {
     <div class="card-header" id=${key}>
       <h5 class="mb-0">
         <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${key}" aria-expanded="true" aria-controls="collapse${key}">
-          ${key} with frequency: ${value}
+          ${key} x ${value}
         </button>
       </h5>
     </div>
@@ -105,24 +115,53 @@ function appendResult(value, key, callback) {
     </div>
   </div>`
   
-  /* Request synonyms from Words API  and append it to the ul */
-  $.getJSON( `https://api.datamuse.com/words?rel_syn=${key}`, function( data ) {
-    var ul = document.getElementById(`list-${key}`)
-    let cnt = 0
-
-    for (let word of data) {
-      cnt++
-      var li = document.createElement("li")
-      li.appendChild(document.createTextNode(word.word))
-      ul.appendChild(li)
-
-      if (cnt == 5) {
-        break
-      }
+  /* Check whether it is a conjunction */
+  if (conjunctions.has(key)) {
+    if (ands.has(key)) {
+      getAlter(key, ands)
+    } else if (becauses.has(key)) {
+      getAlter(key, becauses)
+    } else if (buts.has(key)) {
+      getAlter(key, buts)
+    } else {
+      getAlter(key, ors)
     }
     callback()
-  })
+  } else {
+    /* Request synonyms from Words API  and append it to the ul */
+    $.getJSON( `https://api.datamuse.com/words?rel_syn=${key}`, function( data ) {
+      var ul = document.getElementById(`list-${key}`)
+      let cnt = 0
+
+      for (let word of data) {
+        cnt++
+        var li = document.createElement("li")
+        li.appendChild(document.createTextNode(word.word))
+        ul.appendChild(li)
+
+        if (cnt == 5) {
+          break
+        }
+      }
+      callback()
+    })
+  }
 }
+
+/* Get alternatives for conjunction words */
+function getAlter(key, alters) {
+  console.log(`the word here is ${key}`)
+  console.log(`the array here is ${alters}`)
+  var ul = document.getElementById(`list-${key}`)
+  for (let word of alters) {
+    if (word != key) {
+      var li = document.createElement("li")
+      li.appendChild(document.createTextNode(word))
+      ul.appendChild(li)
+    }
+  }
+}
+
 
 recognition.onresult = function(event) {
   let final_transcript = ''
